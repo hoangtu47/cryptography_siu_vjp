@@ -43,7 +43,7 @@ if not os.path.exists(args.filepath):
 # Store the encrypted file
 
 # Check if the output file was specified if not then ask for input
-if not args.output:
+if args.output is not None:
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     fd = open(args.output, 'w')
 else:
@@ -78,7 +78,7 @@ with open('./metadata/C.metadata', 'w') as file:
 # --- subsection e. ---
 
 # Exprt Kprivate key
-if not args.kprivatefile:
+if args.kprivatefile is not None:
     os.makedirs(os.path.dirname(args.kprivatefile), exist_ok=True)
     with open(args.kprivatefile, 'w') as file:
         # Write Kprivate to file
