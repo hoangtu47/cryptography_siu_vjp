@@ -5,7 +5,8 @@ from Cryptodome.Cipher import AES
 from base64 import b64encode, b64decode
 
 # generate key 
-def generateKeyAES(keySize):
+def generateKeyAES():
+    keySize = input('Enter ASE key size (bit): ')
     key = os.urandom(int(keySize) // 8)
     return key
 
@@ -31,16 +32,12 @@ def decrypt_file_aes(inputFile, outputFile, key):
     nonce = b64decode(b64['nonce'])
     ciphertexts = b64decode(b64['ciphertexts'])
     cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)
-    print('type: ', type(cipher))
     message = cipher.decrypt(ciphertexts)
-    print("The message was: ", message)
   except (ValueError, KeyError):
     print("Incorrect decryption")
   with open(outputFile, "wb") as f:
     f.write(message)
 
-keySize = input('Enter ASE key size (bit): ')
-key = generateKeyAES(keySize)
-print('key: ', key.hex())
+key = generateKeyAES()
 encrypt_file_aes('plaintext.txt', 'ciphertext.txt', key)
 decrypt_file_aes('ciphertext.txt', 'message.txt', key)
