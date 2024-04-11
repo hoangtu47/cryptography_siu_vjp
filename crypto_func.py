@@ -30,3 +30,16 @@ print('cipher: ', cipherText)
 message = decryptRSA(cipherText, Kprivate)
 print('message: ', message)
 
+
+def SHA256(string):
+  return hashlib.sha256(string)
+def SHA1(string):
+  return hashlib.sha1(string)
+
+# test
+string = 'diug guyays dhwu shshu ahdh'
+sha256 = SHA256(string.encode('utf-8'))
+sha1 = SHA1(string.encode('utf-8'))
+
+print('sha256: ', sha256.hexdigest())
+print('sha1: ', sha1.hexdigest())
