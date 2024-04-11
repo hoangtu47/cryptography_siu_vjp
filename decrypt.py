@@ -22,10 +22,17 @@ parser.add_argument('infile',
     help='File path of encrypted file.'
 )
 
+
+# a workaround to enable the program to print the prompt string before asking for input
+# this function print the prompt string prior to return sys.stdin
+def foo():
+    print('Please enter Kprivate key:', end=' ', flush=True)
+    return sys.stdin
+
 parser.add_argument( "-k", "--kprivatefile",
-    nargs='?',
+    nargs='?', 
     type=argparse.FileType('r'),
-    default=sys.stdin,
+    default=foo(),
     help='File path of file storing the Kprivate key.'
 )
 
@@ -50,6 +57,7 @@ with args.infile as file:
 # either from file or user input
 with args.kprivatefile as file:
     KPrivate = file.readline().strip()
+    print('Successfully fetch kprivate input')
     print(KPrivate)
 
 # --- subsection c. ---
@@ -64,4 +72,4 @@ with args.kprivatefile as file:
 
 # --- subsection e. ---
 with args.outfile as file:
-    file.write("hello world!\n")
+    file.write("successfully print output file\n")
