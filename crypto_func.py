@@ -1,4 +1,5 @@
 # pip install pycryptodome
+# pip install pycryptodomex
 import os
 import json
 import hashlib
@@ -79,6 +80,7 @@ print('message: ', message)
 
 def SHA256(string):
   return hashlib.sha256(string)
+
 def SHA1(string):
   return hashlib.sha1(string)
 
