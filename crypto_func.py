@@ -30,7 +30,7 @@ def encrypt_file_aes(inputFile, outputFile, key):
   result = json.dumps({'nonce':nonce, 'ciphertexts':ciphertexts})
 
   with outputFile as f:
-    f.write(result.encode())
+    f.write(result)
 
 def decrypt_file_aes(inputFile, outputFile, key):
   with open(inputFile, "rb") as f:
