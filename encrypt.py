@@ -1,7 +1,12 @@
-#!/usr/bin/python3
+#!/home/hoangtu47/Documents/HCMUS_materials/NetworkSecurity/bin/python3
+
+#/usr/bin/python3
 
 # module for file manipulation
 import os
+
+# to manipulate JSON file
+import json
 
 # module for TextIO handle
 import sys
@@ -18,86 +23,59 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('infile',
-    type=argparse.FileType('r'),
+    type=argparse.FileType('rb'),
     help='File path of plaintext file.'
 )
 
-def foo(something_to_print_out, file_object):
-    print(something_to_print_out, end='', flush=True)
-    return file_object
-
 parser.add_argument( "-k", "--kprivatefile",
     nargs='?',
-    type=argparse.FileType('w'),
-    default=foo("Generated KPrivate key: ", sys.stdout),                
-    help='File path of new file to store the Kprivate key. If the provided file path is not valid, newly created one',
+    type=argparse.FileType('wb'),
+    # To write or read binary data from/to the standard streams
+    default=sys.stdout.buffer,                
+    help='File path of new file to store the Kprivate key.',
 )
 
 parser.add_argument( "-o", "--output",
     nargs='?',
-    type=argparse.FileType('w'),
-    default=foo("Encrypted file's data:\n", sys.stdout),
+    type=argparse.FileType('wb'),
+    # To write or read binary data from/to the standard streams
+    default=sys.stdout.buffer,
     help='Desired file path for the decrypted file.'
 )
 
 args = parser.parse_args()
 
-# --- subsection a. ---
+# --- subsection a + b. ---
 
-
-
-# --- subsection b. ---
 # Ks private key generation 
-# TODO
+KsKey = crypto_func.generateKeyAES()
 
 # Encrypt the provided file using AES
-# TODO
-
-# Store the encrypted file
-
-# Check if the output file was specified if not then ask for input
-if args.output is not None:
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    fd = open(args.output, 'w')
-else:
-    output = input("Enter output file path: ")
-    # create the directory if not already existed
-    os.makedirs(os.path.dirname(output), exist_ok=True)
-
-    fd = open(output, 'w')
-
-# write encrypted file to output file
-# TODO
-
-fd.close()
+# Store the encrypted filey
+crypto_func.encrypt_file_aes(args.infile, args.output, KsKey)
 
 # --- subsection c. ---
 
 # Generation of Kprivate and Kpublic using RSA
-# TODO
+Kprivate, Kpublic = crypto_func.generateRSAKey()
 
 # encrypt Ks using Kpublic
-# TODO 
-
-# print out Kx
-# TODO
+Kxkey = crypto_func.encryptRSA(KsKey, Kpublic)
 
 # --- subsection d. ---
-# write Kx to file, along with it SHA-1
-with open('./metadata/C.metadata', 'w') as file:
-    # TODO
-    pass
+# write Kx to file, along with it SHA-1 as hex format to prevent conversion like UTF-8
+HKprivate = json.dumps({'Kx':Kxkey.hex(), 'SHA-1':crypto_func.SHA1(Kprivate).hex()})
+
+with open("metadata/{}.metadata".format(os.path.basename(sys.argv[1])), 'wb') as file:
+    file.write(HKprivate.encode())
+
+with args.kprivatefile as f:
+    f.write(Kprivate._key.export_key())
 
 # --- subsection e. ---
 
-# Exprt Kprivate key
-if args.kprivatefile is not None:
-    os.makedirs(os.path.dirname(args.kprivatefile), exist_ok=True)
-    with open(args.kprivatefile, 'w') as file:
-        # Write Kprivate to file
-        # TODO
-        pass
-else:
-    # Print Kprivate in std.out
-    # TODO
-    pass
+# Export Kprivate key
+
+args.infile.close()
+args.kprivatefile.close()
+args.output.close()
