@@ -16,8 +16,7 @@ def generateKeyAES():
 
 def encrypt_file_aes(inputFile, outputFile, key):
   # đọc file nhị phân
-  with inputFile as f:
-    plaintexts  = f.read()
+  plaintexts  = inputFile.read()
     
   cipher = AES.new(key, AES.MODE_CTR) # dùng mode ctr: mode mạnh nhất
   
@@ -29,8 +28,8 @@ def encrypt_file_aes(inputFile, outputFile, key):
   
   result = json.dumps({'nonce':nonce, 'ciphertexts':ciphertexts})
 
-  with outputFile as f:
-    f.write(result)
+  outputFile.write(result.encode())
+
 
 def decrypt_file_aes(inputFile, outputFile, key):
   with open(inputFile, "rb") as f:
@@ -68,7 +67,6 @@ def generateRSAKey():
   return Kprivate, Kpublic
 
 def encryptRSA(plainTexts, Kpublic):
-  plainTexts = str.encode(plainTexts)
   return Kpublic.encrypt(plainTexts)
 
 def decryptRSA(cipherTexts, Kprivate):
@@ -83,11 +81,11 @@ message = decryptRSA(cipherText, Kprivate)
 print('message: ', message)
 '''
 
-def SHA256(string):
-  return hashlib.sha256(string)
+def SHA256(Crypto_cipher_obj):
+  return hashlib.sha256(Crypto_cipher_obj)
 
-def SHA1(string):
-  return hashlib.sha1(string)
+def SHA1(Crypto_cipher_obj):
+  return Crypto_cipher_obj._hashObj.new().digest()
 
 ''' test
 string = 'diug guyays dhwu shshu ahdh'
