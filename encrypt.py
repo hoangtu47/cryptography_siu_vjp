@@ -1,6 +1,4 @@
-#!/home/hoangtu47/Documents/HCMUS_materials/NetworkSecurity/bin/python3
-
-#/usr/bin/python3
+#!/usr/bin/python3
 
 # module for file manipulation
 import os
@@ -51,7 +49,7 @@ args = parser.parse_args()
 KsKey = crypto_func.generateKeyAES()
 
 # Encrypt the provided file using AES
-# Store the encrypted filey
+# Store the encrypted file
 crypto_func.encrypt_file_aes(args.infile, args.output, KsKey)
 
 # --- subsection c. ---
@@ -69,12 +67,10 @@ HKprivate = json.dumps({'Kx':Kxkey.hex(), 'SHA-1':crypto_func.SHA1(Kprivate).hex
 with open("metadata/{}.metadata".format(os.path.basename(sys.argv[1])), 'wb') as file:
     file.write(HKprivate.encode())
 
-with args.kprivatefile as f:
-    f.write(Kprivate._key.export_key())
+if args.kprivatefile == sys.stdout.buffer:
+    print("KPrivate key:")
+args.kprivatefile.write(Kprivate._key.export_key())
 
-# --- subsection e. ---
-
-# Export Kprivate key
 
 args.infile.close()
 args.kprivatefile.close()

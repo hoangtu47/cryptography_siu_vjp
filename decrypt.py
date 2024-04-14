@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 
-# module for file manipulation
-import os
+# for JSON file manipulation
+import json
+
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
+
+from base64 import b64encode, b64decode
 
 # module for TextIO handle
 import sys
@@ -18,58 +23,50 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('infile',
-    type=argparse.FileType('r'),
+    type=argparse.FileType("rb"),
     help='File path of encrypted file.'
 )
 
-
-# a workaround to enable the program to print the prompt string before asking for input
-# this function print the prompt string prior to return sys.stdin
-def foo(something_to_print_out, file_object):
-    print(something_to_print_out, end='', flush=True)
-    return file_object
+parser.add_argument('metadata',
+    type=argparse.FileType('rb'),
+    help='File path of metadata storing Kx and SHA-1 of Kprivate.'
+)
 
 parser.add_argument( "-k", "--kprivatefile",
     nargs='?', 
-    type=argparse.FileType('r'),
-    default=foo("Please enter Kprivate key: ", sys.stdin),
+    type=argparse.FileType("rb"),
+    default= sys.stdin.buffer,
     help='File path of file storing the Kprivate key.'
 )
 
 parser.add_argument( "-o", "--outfile",
     nargs='?',
-    type=argparse.FileType('w'),
-    default=sys.stdout,
+    type=argparse.FileType('wb'),
+    default=sys.stdout.buffer,
     help='Desired file path for the decrypted file.'
 )
 
 args = parser.parse_args()
 
 # --- subsection a. ---
+RSA_Kprivate = RSA.import_key(args.kprivatefile.read())
 
-with args.infile as file:
-    # read file content
-    encrpyted_data = file.read()
+privateKey = RSA_Kprivate.export_key('PEM')
+Kprivate = RSA.importKey(privateKey)
+Kprivate = PKCS1_OAEP.new(Kprivate)
 
-# --- subsection b. ---
+# Kprivate SHA-1 checking
+HKprivate = json.loads(args.metadata.read())
 
-# extract Kprivate key
-# either from file or user input
-with args.kprivatefile as file:
-    KPrivate = file.readline().strip()
-    print('Successfully fetch kprivate input')
-    print(KPrivate)
+if crypto_func.SHA1(Kprivate).hex() != HKprivate["SHA-1"]:
+    raise Exception("Kprivate key does not match!")
 
-# --- subsection c. ---
+# In search for Ks key
+Ks = crypto_func.decryptRSA(bytes.fromhex(HKprivate['Kx']), Kprivate)
 
-# Key processing
-# TODO
+crypto_func.decrypt_file_aes(args.infile, args.outfile, Ks)    
 
-# --- subsection d. ---
-
-# Key processing
-# TODO
-
-# --- subsection e. ---
-with args.outfile as file:
-    file.write("successfully print output file\n")
+args.infile.close()
+args.metadata.close()
+args.outfile.close()
+args.kprivatefile.close()

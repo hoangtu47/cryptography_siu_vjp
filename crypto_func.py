@@ -1,6 +1,7 @@
 # pip install pycryptodome
-# pip install pycryptodomex
+
 import os
+import sys
 import json
 import hashlib
 
@@ -15,36 +16,42 @@ def generateKeyAES():
   return os.urandom(32)
 
 def encrypt_file_aes(inputFile, outputFile, key):
-  # đọc file nhị phân
+  
   plaintexts  = inputFile.read()
     
   cipher = AES.new(key, AES.MODE_CTR) # dùng mode ctr: mode mạnh nhất
   
   ctBytes = cipher.encrypt(plaintexts)
   
-  nonce = b64encode(cipher.nonce).decode('utf-8')
+  nonce = b64encode(cipher.nonce)
   
-  ciphertexts = b64encode(ctBytes).decode('utf-8')
+  ciphertexts = b64encode(ctBytes)
   
-  result = json.dumps({'nonce':nonce, 'ciphertexts':ciphertexts})
+  result = json.dumps({'nonce':nonce.hex(), 'ciphertexts':ciphertexts.hex()})
 
+  if outputFile == sys.stdout.buffer:
+    print("The result encrypted file:")
   outputFile.write(result.encode())
 
 
 def decrypt_file_aes(inputFile, outputFile, key):
-  with open(inputFile, "rb") as f:
-    ctBytes = f.read()
+  
+  ctBytes = inputFile.read()
 
   try:
-    b64 = json.loads(ctBytes.decode())
-    nonce = b64decode(b64['nonce'])
-    ciphertexts = b64decode(b64['ciphertexts'])
+
+    b64 = json.loads(ctBytes)
+    
+    nonce = b64decode(bytes.fromhex(b64['nonce']))
+    ciphertexts = b64decode(bytes.fromhex(b64['ciphertexts']))
+    
     cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)
     message = cipher.decrypt(ciphertexts)
+
   except (ValueError, KeyError):
     print("Incorrect decryption")
-  with open(outputFile, "wb") as f:
-    f.write(message)
+  
+  outputFile.write(message)
 
 '''
 key = generateKeyAES()
