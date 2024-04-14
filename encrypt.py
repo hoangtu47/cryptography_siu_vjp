@@ -16,7 +16,7 @@ import crypto_func
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='Encrypt a file using AES and RSA algorithm.',
+    description='Encrypt a file using AES algorithm , key using RSA algorithm.',
     epilog='Made with love by Quoc Bao & Chau Long!'
 )
 
@@ -30,7 +30,7 @@ parser.add_argument( "-k", "--kprivatefile",
     type=argparse.FileType('wb'),
     # To write or read binary data from/to the standard streams
     default=sys.stdout.buffer,                
-    help='File path of new file to store the Kprivate key.',
+    help='File path of new file to store the Kprivate key. If not specified, the standard output stream is used.',
 )
 
 parser.add_argument( "-o", "--output",
@@ -38,7 +38,7 @@ parser.add_argument( "-o", "--output",
     type=argparse.FileType('wb'),
     # To write or read binary data from/to the standard streams
     default=sys.stdout.buffer,
-    help='Desired file path for the decrypted file.'
+    help='Desired file path for the decrypted file. If not specified, the standard output stream is used.'
 )
 
 args = parser.parse_args()

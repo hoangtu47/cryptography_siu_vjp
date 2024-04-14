@@ -36,14 +36,14 @@ parser.add_argument( "-k", "--kprivatefile",
     nargs='?', 
     type=argparse.FileType("rb"),
     default= sys.stdin.buffer,
-    help='File path of file storing the Kprivate key.'
+    help='File path of file storing the Kprivate key. If not specified, the standard input stream is used.'
 )
 
 parser.add_argument( "-o", "--outfile",
     nargs='?',
     type=argparse.FileType('wb'),
     default=sys.stdout.buffer,
-    help='Desired file path for the decrypted file.'
+    help='Desired file path for the decrypted file. If not specified, the standard output stream is used.'
 )
 
 args = parser.parse_args()
